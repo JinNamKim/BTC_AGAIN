@@ -1,54 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using Newtonsoft;
-using Newtonsoft.Json.Linq;
 
 namespace TEST_B
 {
-    public partial class Form1 : Form
+    public class CALL_API
     {
-        public Form1()
-        {
-            InitializeComponent();
-        }
-
-        public CALL_API BINANCE_CALLER = new CALL_API();
-
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            myLog.init();
-            //BINANCE
-            //https://binance-docs.github.io/apidocs/spot/en/#order-book
-
-            string ur = "https://api.binance.com/api/v3/depth?symbol=LTCBTC&limit=5";            
-            string retult = BINANCE_CALLER.callWebClient(ur);
-            Console.WriteLine(retult);
-
-            var json = new JObject();
-
-            var json5 = JObject.Parse(retult);
-            //Console.WriteLine(json5.ToString());
-            Console.WriteLine(json5["bids"]);
-
-            Console.WriteLine(json5["bids"][0]);
-
-            //Console.WriteLine(json.ToString());
-
-
-
-        }
-
-        public static string callWebClient(string targetURL)
+        public string callWebClient(string targetURL)
         {
             string result = string.Empty;
             try
@@ -78,5 +40,6 @@ namespace TEST_B
             }
             return result;
         }
+
     }
 }
