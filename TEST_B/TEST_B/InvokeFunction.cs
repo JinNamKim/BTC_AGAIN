@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,41 @@ namespace TEST_B
             else
             {
                 lb.Items.Add(txt);
+            }
+        }
+
+        public static void DataGridView_Rows_Add(DataGridView dgv)
+        {
+            if(dgv.InvokeRequired)
+            {
+                dgv.Invoke(new MethodInvoker(delegate
+                {
+                    dgv.Rows.Add();
+                }));
+            }
+            else
+            {
+                dgv.Rows.Add();
+            }
+        }
+
+        public static void DataGridView_Rows_SetText(DataGridView dgv, int col, int row, string text)
+        {
+            if (dgv.InvokeRequired)
+            {
+                dgv.Invoke(new MethodInvoker(delegate
+                {
+                    //dgv[col, row].Style.BackColor = Color.Red;
+                    dgv[col, row].Value = text;
+                    //dgv.Rows[row].SetValues(text);
+
+                }));
+            }
+            else
+            {
+                //dgv[col, row].Style.BackColor = Color.Red;
+                //dgv.Rows[row].SetValues(text);
+                dgv[col, row].Value = text;
             }
         }
 

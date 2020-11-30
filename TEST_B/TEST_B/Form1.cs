@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft;
@@ -16,21 +17,69 @@ namespace TEST_B
 {
     public partial class Form1 : Form
     {
+
+        public CALL_API BINANCE_CALLER = new CALL_API();
+        public Thread th_up;
+        public Thread th_binan;
+
         public Form1()
         {
             InitializeComponent();
+            init();
+            
         }
 
-        public CALL_API BINANCE_CALLER = new CALL_API();
+        public void init()
+        {
+            try
+            {
+                myLog.init();
+                myLog.write("프로그램 스타트");
+                datagridview_init();
+                th_up = new Thread(new ThreadStart(up_th));
+                th_binan = new Thread(new ThreadStart(binan_th));
 
+                th_up.Start();
+                th_binan.Start();
+
+            }
+            catch(Exception ex)
+            {
+
+            }
+            finally
+            {
+
+            }
+        }
+
+        public void up_th()
+        {
+
+        }
+
+        public void binan_th()
+        {
+
+        }
+
+        public void datagridview_init()
+        {
+            //dataGridView1.Rows.Add();
+            InvokeFunction.DataGridView_Rows_Add(dataGridView1);
+            InvokeFunction.DataGridView_Rows_Add(dataGridView1);
+            InvokeFunction.DataGridView_Rows_Add(dataGridView1);
+            InvokeFunction.DataGridView_Rows_Add(dataGridView1);
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            myLog.init();
             //BINANCE
             //https://binance-docs.github.io/apidocs/spot/en/#order-book
 
-            string ur = "https://api.binance.com/api/v3/depth?symbol=LTCBTC&limit=5";            
+            string ur = "https://api.binance.com/api/v3/depth?symbol=LTCBTC&limit=5";
+            //string ur = "https://api.upbit.com/v1/orderbook?markets=krw-btc";
+        
             string retult = BINANCE_CALLER.callWebClient(ur);
             Console.WriteLine(retult);
 
@@ -41,10 +90,6 @@ namespace TEST_B
             Console.WriteLine(json5["bids"]);
 
             Console.WriteLine(json5["bids"][0]);
-
-            //Console.WriteLine(json.ToString());
-
-
 
         }
 
@@ -77,6 +122,39 @@ namespace TEST_B
                 Console.WriteLine(e.ToString());
             }
             return result;
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            try
+            {
+                myLog.LOG_CLOSE();
+            }
+            catch(Exception ex)
+            {
+                myLog.LOG_CLOSE();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            dataGridView1.Rows.Add("TEST");
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //dataGridView1.Rows[1].SetValues("KKK");
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 1, 1, "TESSSS");
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
