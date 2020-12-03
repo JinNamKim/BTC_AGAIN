@@ -13,10 +13,63 @@ namespace TEST_B
         private static Thread LOG_THREAD;
         private static Queue<string> STR_QUEUE = new Queue<string>();
 
+        public static event EventHandler<LogEventArg> Writer = delegate { };
+
+        private static Mutex log_mutex = new Mutex();
+
+
+        public class LogEventArg : EventArgs
+        {
+            public string strLogMSG;
+        }
+
+        public static void Log_Write(object sender, LogEventArg e)
+        {
+
+            try
+            {
+                log_mutex.WaitOne();
+                string folderPath = string.Format("{0}\\LOG", System.IO.Directory.GetCurrentDirectory());
+                DirectoryInfo di = new DirectoryInfo(folderPath);
+                if (!di.Exists)
+                {
+                    di.Create();
+                }
+
+                //string folderPath = string.Format("{0}\\LOG", System.IO.Directory.GetCurrentDirectory());
+                string filePath = string.Format("{0}\\{1:yyyyMMdd}.txt", folderPath, DateTime.Now);
+
+                FileInfo fi = new FileInfo(filePath);
+                StreamWriter sw;
+                if (fi.Exists)
+                {
+                    sw = File.AppendText(filePath);
+                }
+                else
+                {
+                    sw = File.CreateText(filePath);
+                }
+
+                sw.WriteLine(string.Format("{0:HH:mm:ss.fff} : {1}", DateTime.Now, e.strLogMSG));
+                sw.Close();
+            }
+            catch(Exception ex)
+            {
+
+            }
+            finally
+            {
+                log_mutex.ReleaseMutex();
+            }
+        }
+
         public static void init()
         {
             try
             {
+
+                Writer += Log_Write;
+
                 string folderPath = string.Format("{0}\\LOG", System.IO.Directory.GetCurrentDirectory());
                 DirectoryInfo di = new DirectoryInfo(folderPath);
                 if (!di.Exists)
@@ -26,8 +79,8 @@ namespace TEST_B
 
                 
 
-                LOG_THREAD = new Thread(new ThreadStart(LOG_thread));
-                LOG_THREAD.Start();
+                //LOG_THREAD = new Thread(new ThreadStart(LOG_thread));
+                //LOG_THREAD.Start();
             }
             catch(Exception ex)
             {
@@ -44,7 +97,12 @@ namespace TEST_B
         {
             try
             {
-                STR_QUEUE.Enqueue(txt);
+                LogEventArg temp = new LogEventArg();
+                temp.strLogMSG = txt;
+                object sender = new object();
+
+                //Writer.Invoke(null, temp);
+                Writer?.Invoke(null, temp);
             }
             catch(Exception ex)
             {

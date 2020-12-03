@@ -61,6 +61,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="InvokeFunction.cs" />
+    <Compile Include="COIN_INFO.cs" />
     <Compile Include="myLog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

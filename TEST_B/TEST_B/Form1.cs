@@ -22,11 +22,30 @@ namespace TEST_B
         public Thread th_up;
         public Thread th_binan;
 
+        double UPBIT_BTC_KRW = 1;
+
+        COIN_INFO 업비트_BTC = new COIN_INFO();
+
+        COIN_INFO 업비트_DCR = new COIN_INFO();
+        COIN_INFO 바이낸스_DCR = new COIN_INFO();
+
+        COIN_INFO 업비트_XRP = new COIN_INFO();
+        COIN_INFO 바이낸스_XRP = new COIN_INFO();
+
         public Form1()
         {
             InitializeComponent();
             init();
-            
+        }
+
+
+        public COIN_INFO SET_COIN_INFO(거래소 거래소, 종목 종목)
+        {
+            COIN_INFO temp = new COIN_INFO();
+            temp.거래소 = 거래소;
+            temp.종목 = 종목;
+
+            return temp;
         }
 
         public void init()
@@ -36,6 +55,18 @@ namespace TEST_B
                 myLog.init();
                 myLog.write("프로그램 스타트");
                 datagridview_init();
+
+                업비트_BTC = SET_COIN_INFO(거래소.UPBIT, 종목.BTC);
+
+                업비트_DCR = SET_COIN_INFO(거래소.UPBIT, 종목.DCR);
+                바이낸스_DCR = SET_COIN_INFO(거래소.BINANCE, 종목.DCR);
+
+                업비트_XRP = SET_COIN_INFO(거래소.UPBIT, 종목.XRP);
+                바이낸스_XRP = SET_COIN_INFO(거래소.BINANCE, 종목.XRP);
+
+
+
+
                 th_up = new Thread(new ThreadStart(up_th));
                 th_binan = new Thread(new ThreadStart(binan_th));
 
@@ -45,7 +76,7 @@ namespace TEST_B
             }
             catch(Exception ex)
             {
-
+                
             }
             finally
             {
@@ -70,27 +101,45 @@ namespace TEST_B
             InvokeFunction.DataGridView_Rows_Add(dataGridView1);
             InvokeFunction.DataGridView_Rows_Add(dataGridView1);
             InvokeFunction.DataGridView_Rows_Add(dataGridView1);
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 0, 0, "BTC(KRW)");
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //BINANCE
-            //https://binance-docs.github.io/apidocs/spot/en/#order-book
+            double result =  CALL_API_UPBIT("https://api.upbit.com/v1/ticker?markets=KRW-DCR");
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 1, 1, string.Format("{0:#,###}", result));
 
-            string ur = "https://api.binance.com/api/v3/depth?symbol=LTCBTC&limit=5";
-            //string ur = "https://api.upbit.com/v1/orderbook?markets=krw-btc";
-        
-            string retult = BINANCE_CALLER.callWebClient(ur);
+            업비트_DCR.현재가_원 = result;
+
+            double result_ = CALL_API_UPBIT("https://api.upbit.com/v1/ticker?markets=KRW-XRP");
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 1, 2, string.Format("{0:#,###}", result_));
+
+            업비트_XRP.현재가_원 = result_;
+
+        }
+
+        public double CALL_API_UPBIT(string URL)
+        {
+            string retult = BINANCE_CALLER.callWebClient(URL);
             Console.WriteLine(retult);
 
-            var json = new JObject();
+            var JARR = JArray.Parse(retult);
 
-            var json5 = JObject.Parse(retult);
-            //Console.WriteLine(json5.ToString());
-            Console.WriteLine(json5["bids"]);
+            string LAST_PRICE = JARR[0]["trade_price"].ToString();
 
-            Console.WriteLine(json5["bids"][0]);
+            return Convert.ToDouble(LAST_PRICE);
+        }
 
+        public double CALL_API_BINANCE(string URL)
+        {
+            string retult = BINANCE_CALLER.callWebClient(URL);
+            Console.WriteLine(retult);
+
+            var JARR = JObject.Parse(retult);
+
+            string LAST_PRICE = JARR["asks"][0][0].ToString();
+            
+            return Convert.ToDouble(LAST_PRICE);
         }
 
         public static string callWebClient(string targetURL)
@@ -138,13 +187,32 @@ namespace TEST_B
 
         private void button2_Click(object sender, EventArgs e)
         {
-            dataGridView1.Rows.Add("TEST");
+            double API_RESULT = CALL_API_BINANCE("https://api.binance.com/api/v3/depth?symbol=DCRBTC&limit=5");
+            double result = UPBIT_BTC_KRW * API_RESULT;
+
+            바이낸스_DCR.현재가_원 = result;
+
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 2, 1, string.Format("{0:#,##0.#######}", result));
+
+
+            double API_RESULT_ = CALL_API_BINANCE("https://api.binance.com/api/v3/depth?symbol=XRPBTC&limit=5");
+            double result_ = UPBIT_BTC_KRW * API_RESULT_;
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 2, 2, string.Format("{0:#,##0.#######}", result_));
+            바이낸스_XRP.현재가_원 = result_;
+
+
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            //dataGridView1.Rows[1].SetValues("KKK");
-            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 1, 1, "TESSSS");
+            double result = CALL_API_UPBIT("https://api.upbit.com/v1/ticker?markets=KRW-BTC");
+            UPBIT_BTC_KRW = result;
+            업비트_BTC.현재가_원 = UPBIT_BTC_KRW;
+
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 1, 0, string.Format("{0:#,###}", result));
+
+            
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -154,7 +222,20 @@ namespace TEST_B
 
         private void button4_Click(object sender, EventArgs e)
         {
+            //myLog.Log_Write(this, "TEST");
+            
+            myLog.write("TEST");
+        }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+
+            double 차액 = 업비트_DCR.현재가_원 - 바이낸스_DCR.현재가_원;
+
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 3, 1, string.Format("{0:#,###}", 차액));
+
+            double 차액_ = 업비트_XRP.현재가_원 - 바이낸스_XRP.현재가_원;
+            InvokeFunction.DataGridView_Rows_SetText(dataGridView1, 3, 2, string.Format("{0:#,###0.##}", 차액_));
         }
     }
 }
