@@ -8,15 +8,18 @@ namespace TEST_B
 {
     public enum 거래소 : Int32
     {
-        UPBIT,
+        UPBIT = 1,
         BINANCE
     }
 
     public enum 종목 : Int32
     {
-        BTC,
+        BTC = 0,
         DCR,
-        XRP
+        XRP,        //리플
+        ZIL,        //질리카
+        XLM,         //스텔라루멘
+        ADA         //에이다
     }
     public class COIN_INFO
     {
@@ -24,5 +27,6 @@ namespace TEST_B
         public 거래소 거래소;
         public double 현재가_원;
         public double 현재가_BTC;
+        public string URL;
     }
 }
