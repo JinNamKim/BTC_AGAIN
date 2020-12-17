@@ -75,5 +75,46 @@ namespace TEST_B
             }
         }
 
+
+        public static void DataGridView_Rows_SetBackColor(DataGridView dgv, int col, int row, Color color)
+        {
+            if (dgv.InvokeRequired)
+            {
+                dgv.Invoke(new MethodInvoker(delegate
+                {
+                    //dgv[col, row].Style.BackColor = Color.Red;
+                    dgv[col, row].Style.BackColor = color;
+                    //dgv.Rows[row].SetValues(text);
+
+                }));
+            }
+            else
+            {
+                //dgv[col, row].Style.BackColor = Color.Red;
+                //dgv.Rows[row].SetValues(text);
+                dgv[col, row].Style.BackColor = color;
+            }
+        }
+        public static void DataGridView_Rows_SetFontColor(DataGridView dgv, int col, int row, Color color)
+        {
+            if (dgv.InvokeRequired)
+            {
+                dgv.Invoke(new MethodInvoker(delegate
+                {
+                    //dgv[col, row].Style.BackColor = Color.Red;
+                    dgv[col, row].Style.ForeColor = color;
+                    //dgv.Rows[row].SetValues(text);
+
+                }));
+            }
+            else
+            {
+                //dgv[col, row].Style.BackColor = Color.Red;
+                //dgv.Rows[row].SetValues(text);
+                dgv[col, row].Style.ForeColor = color;
+            }
+        }
+
+
     }
 }
