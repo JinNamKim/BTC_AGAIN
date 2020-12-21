@@ -24,6 +24,7 @@ namespace TEST_B
         int ROW = 3+3;
         int 차액_PERCENTAGE = 4+3;
         int ROW_리턴금액 = 5 + 3;
+        int ROW_퍼센테이지변동 = 6 + 3;
 
         public CALL_API BINANCE_CALLER = new CALL_API();
 
@@ -152,7 +153,8 @@ namespace TEST_B
                 temp_4.종목 = (종목)Enum.ToObject(typeof(종목), i);
                 temp_5.종목 = (종목)Enum.ToObject(typeof(종목), i);
 
-                temp_1.URL = string.Format("https://api.upbit.com/v1/ticker?markets=KRW-{0}", temp_1.종목.ToString());
+                //temp_1.URL = string.Format("https://api.upbit.com/v1/ticker?markets=KRW-{0}", temp_1.종목.ToString());
+                temp_1.URL = string.Format("https://api.upbit.com/v1/candles/minutes/3?market=KRW-{0}&count=1", temp_1.종목.ToString());
                 UPBIT_INFO_LIST.Add(temp_1);
 
                 temp_2.URL = string.Format("https://api.binance.com/api/v3/depth?symbol={0}BTC&limit=5", temp_2.종목.ToString());
@@ -342,7 +344,8 @@ namespace TEST_B
                         COIN_INFO temp_bittrex = BITTREX_INFO_LIST.Find(x => x.종목 == (종목)Enum.ToObject(typeof(종목), i));
                         COIN_INFO temp_huobi = HUOBI_INFO_LIST.Find(x => x.종목 == (종목)Enum.ToObject(typeof(종목), i));
 
-                        if(temp_upbit.CHECK && temp_binance.CHECK && temp_bittrex.CHECK && temp_huobi.CHECK)
+                        //if(temp_upbit.CHECK && temp_binance.CHECK && temp_bittrex.CHECK && temp_huobi.CHECK)
+                        if(true)
                         {
                             GET_DIFF(TOTAL_LIST, Enum.GetNames(typeof(종목)).GetValue(i).ToString());
                             temp_upbit.CHECK = false;
@@ -358,7 +361,7 @@ namespace TEST_B
 
 
                     //Calc_Diff();
-                    Thread.Sleep(DELAY * 1);
+                    //Thread.Sleep(DELAY * 1);
                     
                 }
             }
@@ -440,7 +443,7 @@ namespace TEST_B
             {
                 while (true)
                 {
-                    
+                    DELAY = Convert.ToInt32(textBox5.Text);
                     Call_UPBIT();
                     Thread.Sleep(DELAY * 1);
 
@@ -1173,10 +1176,29 @@ namespace TEST_B
                 var JARR = JArray.Parse(retult);
 
                 string LAST_PRICE = JARR[0]["trade_price"].ToString();
+
+                string low_price = JARR[0]["low_price"].ToString();
+
                 result = Convert.ToDouble(LAST_PRICE);
 
+                double d_low_price = Convert.ToDouble(low_price);
+
+                double per = (result - d_low_price) / d_low_price * 100;
+                //InvokeFunction.DataGridView_Rows_SetText(dataGridView1, Convert.ToInt32(coinInfo.거래소), ROW_퍼센테이지변동, string.Format("{0:#,###.##}", per));
+                //InvokeFunction.DataGridView_Rows_SetText(dataGridView1, Convert.ToInt32(coinInfo.거래소), 10, string.Format("{0}", "TEST"));
+                InvokeFunction.DataGridView_Rows_SetText(dataGridView1, ROW_퍼센테이지변동, Convert.ToInt32(coinInfo.종목), string.Format("{0:#,###0.##}", per));
+                if(per > Convert.ToDouble(textBox4.Text))
+                {
+                    InvokeFunction.ListBoxAdd(listBox1, string.Format("{0:HH:mm:ss} - {1} : 1분 변동 : {2:#,##0.###0}%", DateTime.Now, coinInfo.종목.ToString(), per));
+                }
+
+
                 if (coinInfo.종목 == 종목.BTC)
+                {
                     UPBIT_BTC_KRW = result;
+                    InvokeFunction.Label_Set_Text(label2, string.Format("{0:#,###}", UPBIT_BTC_KRW));
+                }
+                    
 
                 //return result;
             }
@@ -1362,7 +1384,7 @@ namespace TEST_B
             BINANCE_thread.Start();
             BITTREX_thread.Start();
             HUOBI_thread.Start();
-            BITHUMB_thread.Start();
+            //BITHUMB_thread.Start();
 
             DIFF_thread.Start();
         }
@@ -1393,6 +1415,47 @@ namespace TEST_B
         
 
 
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Find_GridView(textBox3.Text);
+            }
+            catch(Exception ex)
+            {
+
+            }
+            
+        }
+
+        public void Find_GridView(string str_종목)
+        {
+            try
+            {
+                string str = str_종목;
+                int idx = 0;
+                for (int i = 0; i < Enum.GetNames(typeof(종목)).Length; i++)
+                {
+                    string jong = Enum.GetNames(typeof(종목)).GetValue(i).ToString();
+                    if (str == jong || str.ToUpper() == jong)
+                    {
+                        idx = i;
+                        break;
+                    }
+                }
+                InvokeFunction.DataGridView_Rows_Select(dataGridView1, idx, 0);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            InvokeFunction.ListBoxClear(listBox1);
         }
     }
 }

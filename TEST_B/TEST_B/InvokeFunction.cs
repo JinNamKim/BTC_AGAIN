@@ -10,6 +10,23 @@ namespace TEST_B
 {
     public static class InvokeFunction
     {
+
+        public static void Label_Set_Text(Label lb, string str)
+        {
+            if (lb.InvokeRequired)
+            {
+                lb.Invoke(new MethodInvoker(delegate
+                {
+                    lb.Text = str;
+                }));
+            }
+            else
+            {
+                lb.Text = str;
+            }
+        }
+
+
         public static void ListBoxClear(ListBox lb)
         {
             if (lb.InvokeRequired)
@@ -32,11 +49,13 @@ namespace TEST_B
                 lb.Invoke(new MethodInvoker(delegate
                 {
                     lb.Items.Add(txt);
+                    lb.SelectedIndex = lb.Items.Count - 1;
                 }));
             }
             else
             {
                 lb.Items.Add(txt);
+                lb.SelectedIndex = lb.Items.Count - 1;
             }
         }
 
@@ -112,6 +131,31 @@ namespace TEST_B
                 //dgv[col, row].Style.BackColor = Color.Red;
                 //dgv.Rows[row].SetValues(text);
                 dgv[col, row].Style.ForeColor = color;
+            }
+        }
+
+
+        public static void DataGridView_Rows_Select(DataGridView dgv, int row_idx, int last_col)
+        {
+            if (dgv.InvokeRequired)
+            {
+                dgv.Invoke(new MethodInvoker(delegate
+                {
+                    //dgv[col, row].Style.BackColor = Color.Red;
+                    //dgv[col, row].Style.ForeColor = color;
+                    //dgv.Rows[row].SetValues(text);
+                    dgv.CurrentCell = dgv.Rows[row_idx].Cells[last_col];
+                    dgv.BeginEdit(true);
+                    //dgpay.Rows[2].Selected = true; 
+
+                }));
+            }
+            else
+            {
+                //dgv[col, row].Style.BackColor = Color.Red;
+                //dgv.Rows[row].SetValues(text);
+                dgv.CurrentCell = dgv.Rows[row_idx].Cells[last_col];
+                dgv.BeginEdit(true);
             }
         }
 
