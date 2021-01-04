@@ -18,7 +18,7 @@ namespace TEST_B
                 WebClient client = new WebClient();
 
                 //특정 요청 헤더값을 추가해준다. 
-                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                //client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
 
                 using (Stream data = client.OpenRead(targetURL))
                 {
